@@ -13,6 +13,6 @@ export default defineConfig({
     outDir: "docs",
   },
   define: {
-    baseUrl: JSON.stringify(baseUrl),
+    VITE_BASE_URL: JSON.stringify(baseUrl),
   },
 });
