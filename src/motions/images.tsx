@@ -59,7 +59,7 @@ function ImagesScroll() {
       >
         <motion.img
           className="fixed top-0 left-0 w-full h-200vh object-cover z-1 pointer-events-none transform-origin-b shadow-2xl"
-          src="/images/main.avif"
+          src={`${baseUrl === "/" ? "" : baseUrl}/images/main.avif`}
           alt="Scrolling Image"
           custom={scrollY}
           style={{
@@ -73,7 +73,7 @@ function ImagesScroll() {
         />
         <motion.img
           className="fixed top-0 left-0 w-full h-200vh object-cover z-1 pointer-events-none transform-origin-b shadow-2xl"
-          src="/images/main.avif"
+          src={`${baseUrl === "/" ? "" : baseUrl}/images/main.avif`}
           alt="Scrolling Image"
           custom={scrollY}
           style={{
@@ -87,7 +87,7 @@ function ImagesScroll() {
         />
         <motion.img
           className="fixed top-0 left-0 w-full h-200vh object-cover z-1 pointer-events-none shadow-2xl"
-          src="/images/main.avif"
+          src={`${baseUrl === "/" ? "" : baseUrl}/images/main.avif`}
           alt="Scrolling Image"
           custom={scrollY}
           style={{
@@ -136,7 +136,7 @@ export function SmallImages({
           return (
             <div key={idx} className="h-full w-1/4 overflow-hidden">
               <motion.img
-                src={`/images/${idx}.jpg`}
+                src={`${baseUrl === "/" ? "" : baseUrl}/images/${idx}.jpg`}
                 className="w-full h-full bg-white object-cover"
                 initial={{
                   scale: 1.1,

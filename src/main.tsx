@@ -12,8 +12,6 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-console.log(import.meta.env.VITE_BASE_URL);
-
 const router = createBrowserRouter(
   [
     {
