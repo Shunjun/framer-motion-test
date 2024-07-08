@@ -1,7 +1,7 @@
-import { motion } from "framer-motion";
+import { motion, TargetAndTransition } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { TransactionType } from "./type";
-import { ScrollContainerProvider } from "./scrollContainer";
+import { ScrollContainerProvider, useScrollContainer } from "./scrollContainer";
 
 interface BackgroundProps {
   className?: string;
@@ -31,46 +31,68 @@ export function Background(props: BackgroundProps) {
 
   return (
     <ScrollContainerProvider value={scrollContainer}>
-      <motion.div
-        ref={scrollContainer}
-        id="scroll-container"
-        className={`${
-          className ? className : ""
-        } absolute top-0 left-0 w-full h-full overflow-auto isolate`}
-        initial={{ zIndex: -1 }}
-        animate={{ zIndex: 0 }}
-        exit={{
-          zIndex: 1,
-          transition: {
-            duration: 2,
-          },
-        }}
-      >
+      <OutTransaction key="outTransaction" color={color} className={className}>
         {children}
-        <div className="fixed top-0 left-0 w-full h-full -z-1">
-          <OutTransaction key="OutTransaction" color={color} />
-        </div>
-      </motion.div>
+      </OutTransaction>
     </ScrollContainerProvider>
+  );
+}
+
+function BaseBackground({
+  children,
+  className,
+  exit,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  exit?: TargetAndTransition;
+}) {
+  const scrollContainer = useScrollContainer()!;
+
+  return (
+    <motion.div
+      ref={scrollContainer}
+      id="scroll-container"
+      className={`${className} absolute top-0 left-0 w-full h-full overflow-auto isolate`}
+      initial={{ zIndex: -1 }}
+      animate={{ zIndex: 0 }}
+      exit={{
+        zIndex: 1,
+        transition: {
+          duration: 2,
+        },
+        ...exit,
+      }}
+    >
+      {children}
+    </motion.div>
   );
 }
 
 interface OutProps {
   color: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-function NominalOut({ color, className }: OutProps) {
+function NominalOut({ color, className, children }: OutProps) {
   return (
-    <motion.div
-      className={`absolute top-0 left-0 w-full h-full ${color} ${className}`}
+    <BaseBackground
+      className={className}
       exit={{
         opacity: 0,
         transition: {
           duration: 1,
         },
       }}
-    />
+    >
+      {children}
+      <div className="fixed top-0 left-0 w-full h-full -z-1">
+        <motion.div
+          className={`absolute top-0 left-0 w-full h-full ${color}`}
+        />
+      </div>
+    </BaseBackground>
   );
 }
 
@@ -89,32 +111,37 @@ const getDelays = ((length: number) => {
   };
 })(lineCount);
 
-function LineOut({ color, className }: OutProps) {
+function LineOut({ children, color, className }: OutProps) {
   return (
-    <div
-      className={`${className} absolute top-0 left-0 w-full h-full flex flex-col-reverse`}
-    >
-      {Array.from({ length: lineCount }).map((_, idx) => {
-        return (
-          <motion.div
-            key={idx}
-            className={`w-full flex-1 ${color}`}
-            exit={{
-              y: `${lineCount * 100}%`,
-              scaleY: 0,
-            }}
-            transition={{
-              duration: 2,
-              delay: getDelays(idx),
-            }}
-          />
-        );
-      })}
-    </div>
+    <BaseBackground className={className}>
+      {children}
+      <div className="fixed top-0 left-0 w-full h-full -z-1">
+        <div
+          className={`absolute top-0 left-0 w-full h-full flex flex-col-reverse`}
+        >
+          {Array.from({ length: lineCount }).map((_, idx) => {
+            return (
+              <motion.div
+                key={idx}
+                className={`w-full flex-1 ${color}`}
+                exit={{
+                  y: `${lineCount * 100}%`,
+                  scaleY: 0,
+                }}
+                transition={{
+                  duration: 2,
+                  delay: getDelays(idx),
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </BaseBackground>
   );
 }
 
-function PointOut({ color, className }: OutProps) {
+function PointOut({ children, color, className }: OutProps) {
   const [bgSize, setBgSize] = useState(
     Math.max(window.innerWidth, window.innerHeight)
   );
@@ -127,30 +154,35 @@ function PointOut({ color, className }: OutProps) {
   }, []);
 
   return (
-    <div
-      className={`${className} absolute top-0 left-1/2 transform -translate-x-1/2 grid grid-cols-10`}
-      style={{ width: bgSize, height: bgSize }}
-    >
-      {Array.from({ length: 100 }).map((_, idx) => {
-        const col = idx % 10;
-        const row = Math.floor(idx / 10);
-        return (
-          <motion.div
-            key={idx}
-            className={`w-full h-full rounded-full ${color}`}
-            initial={{
-              scale: 1.5,
-            }}
-            exit={{
-              scale: 0,
-            }}
-            transition={{
-              duration: 2,
-              delay: (col + row) * 0.1,
-            }}
-          />
-        );
-      })}
-    </div>
+    <BaseBackground className={className}>
+      {children}
+      <div className="fixed top-0 left-0 w-full h-full -z-1">
+        <div
+          className={`absolute top-0 left-1/2 transform -translate-x-1/2 grid grid-cols-10`}
+          style={{ width: bgSize, height: bgSize }}
+        >
+          {Array.from({ length: 100 }).map((_, idx) => {
+            const col = idx % 10;
+            const row = Math.floor(idx / 10);
+            return (
+              <motion.div
+                key={idx}
+                className={`w-full h-full rounded-full ${color}`}
+                initial={{
+                  scale: 1.5,
+                }}
+                exit={{
+                  scale: 0,
+                }}
+                transition={{
+                  duration: 2,
+                  delay: (col + row) * 0.1,
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </BaseBackground>
   );
 }

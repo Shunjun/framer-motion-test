@@ -12,31 +12,36 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      Component: App,
+      children: [
+        {
+          path: "home",
+          Component: Home,
+        },
+        {
+          path: "images",
+          Component: Images,
+        },
+        {
+          path: "/",
+          element: <Navigate to="/home" replace />,
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    Component: App,
-    children: [
-      {
-        path: "home",
-        Component: Home,
-      },
-      {
-        path: "images",
-        Component: Images,
-      },
-      {
-        path: "/",
-        element: <Navigate to="/home" replace />,
-      },
-    ],
-  },
-]);
+    basename: baseUrl || "/",
+  }
+);
 
 console.log(router);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
