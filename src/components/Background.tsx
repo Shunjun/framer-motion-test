@@ -1,5 +1,5 @@
 import { motion, TargetAndTransition } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { TransactionType } from "./type";
 import { ScrollContainerProvider, useScrollContainer } from "./scrollContainer";
 
@@ -25,14 +25,23 @@ export function Background(props: BackgroundProps) {
     color = "bg-[#fbf5ef]",
   } = props;
 
-  const scrollContainer = useRef<HTMLDivElement>(null);
+  const scrollContainer = useRef<HTMLDivElement | null>(null);
+  const [isReady, updateReady] = useReducer((state) => {
+    return !state;
+  }, false);
 
   const OutTransaction = outTransactionMap[type];
 
   return (
-    <ScrollContainerProvider value={scrollContainer}>
+    <ScrollContainerProvider
+      value={{
+        isReady,
+        updateReady,
+        ref: scrollContainer,
+      }}
+    >
       <OutTransaction key="outTransaction" color={color} className={className}>
-        {children}
+        {isReady && children}
       </OutTransaction>
     </ScrollContainerProvider>
   );
@@ -47,11 +56,21 @@ function BaseBackground({
   className?: string;
   exit?: TargetAndTransition;
 }) {
-  const scrollContainer = useScrollContainer()!;
+  const { ref, updateReady, isReady } = useScrollContainer()!;
+
+  const getRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (!isReady && ref) {
+        ref.current = node;
+        updateReady();
+      }
+    },
+    [isReady]
+  );
 
   return (
     <motion.div
-      ref={scrollContainer}
+      ref={getRef}
       id="scroll-container"
       className={`${className} absolute top-0 left-0 w-full h-full overflow-auto isolate`}
       initial={{ zIndex: -1 }}

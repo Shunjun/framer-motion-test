@@ -14,11 +14,11 @@ export default function Images() {
 }
 
 function ImagesScroll() {
-  const scrollContainer = useScrollContainer();
+  const { ref: scrollRef } = useScrollContainer();
   const imageContainer = useRef<HTMLDivElement>(null);
 
   const { scrollY } = useScroll({
-    container: scrollContainer!,
+    container: scrollRef!,
   });
 
   const vh = window.innerHeight;
@@ -33,7 +33,7 @@ function ImagesScroll() {
   const borderRadius = useTransform(scrollY, [0, vh], [200, 0]);
 
   const { scrollYProgress } = useScroll({
-    container: scrollContainer!,
+    container: scrollRef!,
     target: imageContainer,
     offset: ["end end", "101% end"],
   });
@@ -99,7 +99,7 @@ function ImagesScroll() {
           }}
         />
       </motion.section>
-      <SmallImages vh={vh} containerRef={scrollContainer!} />
+      <SmallImages vh={vh} containerRef={scrollRef!} />
     </>
   );
 }
