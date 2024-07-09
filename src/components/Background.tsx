@@ -1,5 +1,12 @@
 import { motion, TargetAndTransition } from "framer-motion";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { TransactionType } from "./type";
 import { ScrollContainerProvider, useScrollContainer } from "./scrollContainer";
 
@@ -26,11 +33,15 @@ export function Background(props: BackgroundProps) {
   } = props;
 
   const scrollContainer = useRef<HTMLDivElement | null>(null);
-  const [isReady, updateReady] = useReducer((state) => {
-    return !state;
+  const [isReady, updateReady] = useReducer(() => {
+    return true;
   }, false);
 
+  console.log(isReady);
+
   const OutTransaction = outTransactionMap[type];
+
+  const memoChildren = useMemo(() => children, [children]);
 
   return (
     <ScrollContainerProvider
@@ -41,7 +52,7 @@ export function Background(props: BackgroundProps) {
       }}
     >
       <OutTransaction key="outTransaction" color={color} className={className}>
-        {isReady && children}
+        {isReady && memoChildren}
       </OutTransaction>
     </ScrollContainerProvider>
   );
@@ -57,16 +68,15 @@ function BaseBackground({
   exit?: TargetAndTransition;
 }) {
   const { ref, updateReady, isReady } = useScrollContainer()!;
+  const isReadyRef = useRef(isReady);
+  isReadyRef.current = isReady;
 
-  const getRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (!isReady && ref) {
-        ref.current = node;
-        updateReady();
-      }
-    },
-    [isReady]
-  );
+  const getRef = useCallback((node: HTMLDivElement) => {
+    if (!isReadyRef.current && ref) {
+      ref.current = node;
+      updateReady();
+    }
+  }, []);
 
   return (
     <motion.div
