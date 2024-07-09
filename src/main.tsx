@@ -5,37 +5,28 @@ import "virtual:uno.css";
 import Home from "./motions/home.tsx";
 import Images from "./motions/images.tsx";
 
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
+import { createHashRouter, Navigate, RouterProvider } from "react-router-dom";
 
-const router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      Component: App,
-      children: [
-        {
-          path: "home",
-          Component: Home,
-        },
-        {
-          path: "images",
-          Component: Images,
-        },
-        {
-          path: "/",
-          element: <Navigate to="/home" replace />,
-        },
-      ],
-    },
-  ],
+const router = createHashRouter([
   {
-    basename: baseUrl || "/",
-  }
-);
+    path: "/",
+    Component: App,
+    children: [
+      {
+        path: "home",
+        Component: Home,
+      },
+      {
+        path: "images",
+        Component: Images,
+      },
+      {
+        path: "/",
+        element: <Navigate to="/home" replace />,
+      },
+    ],
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   // <React.StrictMode>
